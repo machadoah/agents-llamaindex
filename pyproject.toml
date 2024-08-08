@@ -16,7 +16,7 @@ fastapi = "^0.112.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.8.0"
-ignr = "^2.2"
+axeh = "^0.0.1"
 
 [build-system]
 requires = ["poetry-core"]
