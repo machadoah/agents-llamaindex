@@ -107,7 +107,11 @@ if __name__ == "__main__":
 
     # resposta = agent.query('Abra o site https://github.com/machadoah/agents-llamaindex no chrome!')
     # resposta = agent.query('Abra o aplicativo local vscode em meu computador!')
-    resposta = agent.query(
-        "Crie um haiku sobre python e abra o aplicativo da minha maquina vscode"
-    )
-    print(resposta)
+    try:
+        resposta = agent.query(
+            "Crie um haiku sobre python e abra o aplicativo da minha maquina vscode"
+        )
+        print(resposta)
+    except Exception as e:
+        print("🤖: CARACA!\nVocê me fez pensar demais!")
+
