@@ -1,3 +1,5 @@
+import subprocess
+
 import requests
 from dotenv import load_dotenv
 from llama_index.llms.groq import Groq
@@ -12,8 +14,45 @@ app = FastAPI()
 llm = Groq(model="llama-3.1-70b-versatile", temperature=0)
 
 
+def open_url(url: str) -> str:
+    """
+    Opens a url in browser chrome
+
+    :param url:
+    :return:
+    """
+
+    try:
+        subprocess.Popen(["xdg-open", url])
+        return "successfully open url"
+    except Exception as e:
+        print(e)
+
+
+def open_application(application_name: str) -> str:
+    """
+    Opens an application in my computer
+
+    :param application_name: name of application
+
+    :return: succesfully opened application or failed
+    """
+
+    try:
+        subprocess.Popen([application_name])
+        return "successfully opened " + application_name
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+def creator_aplication(application_name: str) -> str:
+    return llm.complete(
+        f"quem criou a aplicação ou biblioteca chamada={application_name}"
+    )
+
+
 def welcome_httpie() -> str:
-    data = requests.get(url='https://httpie.io/Hello')
+    data = requests.get(url="https://httpie.io/Hello")
     response = data.json()
 
     return response
@@ -28,7 +67,7 @@ def count_characters(text: str) -> int:
 
 
 if __name__ == "__main__":
-    print("*** Hello Agents LlamaIndex ***", end='\n\n')
+    print("*** Hello Agents LlamaIndex ***", end="\n\n")
 
     tool1 = FunctionTool.from_defaults(
         fn=write_haiku,
@@ -46,14 +85,29 @@ if __name__ == "__main__":
         description="Faz um get para o endpoint do httpie",
     )
 
-    agent = ReActAgent.from_tools(
-        tools=[tool1, tool2, tool3],
-        llm=llm,
-        verbose=True
+    tool4 = FunctionTool.from_defaults(
+        fn=creator_aplication,
+        name="adivinhando_creador",
+        description="Vê quem desenvolvou dado aplicativo ou framework",
     )
 
-    resposta = agent.query('Escreva para mim um haicai sobre olimpiadas e conte a quantidade de caracteres nele ')
-    print(resposta)
+    tool5 = FunctionTool.from_defaults(
+        fn=open_application,
+        name="open_application",
+        description="Open a application in Operating System",
+    )
 
-    resposta = agent.query('Qual a mensagem de bem vinda do serviço httpie?')
+    tool6 = FunctionTool.from_defaults(
+        fn=open_url, name="open_url", description="Open a url in chrome browser"
+    )
+
+    agent = ReActAgent.from_tools(
+        tools=[tool1, tool2, tool3, tool4, tool5, tool6], llm=llm, verbose=True
+    )
+
+    # resposta = agent.query('Abra o site https://github.com/machadoah/agents-llamaindex no chrome!')
+    # resposta = agent.query('Abra o aplicativo local vscode em meu computador!')
+    resposta = agent.query(
+        "Crie um haiku sobre python e abra o aplicativo da minha maquina vscode"
+    )
     print(resposta)
